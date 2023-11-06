@@ -75,27 +75,19 @@ class Game:
         self.rotate_side('BACK')
         self.movimientos.append('BACK')
 
-            
-    
     def rotate_to_solve(self):
-        
-        for movimiento in reversed(self.movimientos):
-            print(movimiento)
-            invoke(self.rotate_side_2(movimiento), delay=2)
-        print(self.movimientos)
+        reverse_movements = self.movimientos[::-1]
+        delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
+
+        def solve_recursive():
+            if reverse_movements:
+                movement = reverse_movements.pop(0)
+                self.rotate_side_2(movement)
+                invoke(solve_recursive, delay=delay_between_moves)
+
+        solve_recursive()
         self.movimientos = []
-    
-    # def rotate_to_solve(self):
-    #     tiempo_transcurrido = 0
-    #     retraso_deseado = 0.5  # 1 segundo de retraso
-    #     for movimiento in reversed(self.movimientos):
-    #         tiempo_transcurrido += time.dt
-    #         if tiempo_transcurrido >= retraso_deseado:
-    #             self.rotate_side_2(movimiento)
-    #             tiempo_transcurrido = 0 
-                
-    #     print(self.movimientos)
-    #     self.movimientos = []
+            
     def load_game(self):
         self.create_cube_positions()
         self.CUBES = [Entity(model=self.model, texture=self.texture, position=pos) for pos in self.SIDE_POSITIONS]
@@ -199,3 +191,23 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.ursina_instance.run()
+    
+    # def rotate_to_solve(self):
+        
+    #     for movimiento in reversed(self.movimientos):
+    #         print(movimiento)
+    #         invoke(self.rotate_side_2(movimiento), delay=2)
+    #     print(self.movimientos)
+    #     self.movimientos = []
+    
+    # def rotate_to_solve(self):
+    #     tiempo_transcurrido = 0
+    #     retraso_deseado = 0.5  # 1 segundo de retraso
+    #     for movimiento in reversed(self.movimientos):
+    #         tiempo_transcurrido += time.dt
+    #         if tiempo_transcurrido >= retraso_deseado:
+    #             self.rotate_side_2(movimiento)
+    #             tiempo_transcurrido = 0 
+                
+    #     print(self.movimientos)
+    #     self.movimientos = []
