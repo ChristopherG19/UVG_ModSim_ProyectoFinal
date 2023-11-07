@@ -89,6 +89,8 @@ class Game:
         # Restaurar el plano de fondo
         Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5, color=color.light_gray)
 
+        self.move_text = Text(text='', origin=(0, 15), color=color.black)
+
         # Volver a cargar el juego
         self.load_game()
         
