@@ -19,7 +19,12 @@ class Game:
         # Crear botones para rotar las caras
         button_scale = (0.15, 0.05)
         button_color = color.azure
-        button_spacing = 0.1  # Espacio vertical entre los botones
+        button_spacing = 0.07  # Espacio vertical entre los botones
+        
+        # Define las posiciones de las capas internas
+        self.MIDDLE_X = {Vec3(0, y, z) for y in range(-1, 2) for z in range(-1, 2)}
+        self.MIDDLE_Y = {Vec3(x, 0, z) for x in range(-1, 2) for z in range(-1, 2)}
+        self.MIDDLE_Z = {Vec3(x, y, 0) for x in range(-1, 2) for y in range(-1, 2)}
 
         # Botón para rotar la cara derecha
         self.rotate_right_button = Button(text="Rotate Right Face", color=button_color, scale=button_scale, position=(0.8, 0.2))
@@ -38,12 +43,22 @@ class Game:
         self.rotate_bottom_button.on_click = self.rotate_bottom_face
 
         # Botón para rotar la cara frontal
-        self.rotate_face_button = Button(text="Rotate Face Face", color=button_color, scale=button_scale, position=(0.8, 0.2 - 4 * button_spacing))
+        self.rotate_face_button = Button(text="Rotate Front Face", color=button_color, scale=button_scale, position=(0.8, 0.2 - 4 * button_spacing))
         self.rotate_face_button.on_click = self.rotate_face_face
 
         # Botón para rotar la cara trasera
         self.rotate_back_button = Button(text="Rotate Back Face", color=button_color, scale=button_scale, position=(0.8, 0.2 - 5 * button_spacing))
         self.rotate_back_button.on_click = self.rotate_back_face
+        
+        # Agrega botones para rotar las capas internas
+        self.rotate_middle_x_button = Button(text="Rotate Middle X Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 7 * button_spacing))
+        self.rotate_middle_x_button.on_click = self.rotate_middle_x_layer
+
+        self.rotate_middle_y_button = Button(text="Rotate Middle Y Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 8 * button_spacing))
+        self.rotate_middle_y_button.on_click = self.rotate_middle_y_layer
+
+        self.rotate_middle_z_button = Button(text="Rotate Middle Z Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 9 * button_spacing))
+        self.rotate_middle_z_button.on_click = self.rotate_middle_z_layer
         
         # Resolver
         self.solve_button = Button(text="Solve", color=button_color, scale=button_scale, position=(0.8, 0.2 - 6 * button_spacing))
@@ -75,6 +90,17 @@ class Game:
         self.rotate_side('BACK')
         self.movimientos.append('BACK')
 
+    def rotate_middle_x_layer(self):
+        self.rotate_side('MIDDLE_X')
+        self.movimientos.append('MIDDLE_X')
+
+    def rotate_middle_y_layer(self):
+        self.rotate_side('MIDDLE_Y')
+        self.movimientos.append('MIDDLE_Y')
+
+    def rotate_middle_z_layer(self):
+        self.rotate_side('MIDDLE_Z')
+        self.movimientos.append('MIDDLE_Z')
             
     
     def rotate_to_solve(self):
@@ -100,9 +126,9 @@ class Game:
         self.create_cube_positions()
         self.CUBES = [Entity(model=self.model, texture=self.texture, position=pos) for pos in self.SIDE_POSITIONS]
         self.PARENT = Entity()
-        self.rotation_axes = {'LEFT': 'x', 'RIGHT': 'x', 'TOP': 'y', 'BOTTOM': 'y', 'FACE': 'z', 'BACK': 'z'}
-        self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FACE': self.FACE, 'BACK': self.BACK, 'TOP': self.TOP}
-        self.animation_time = 0.5
+        self.rotation_axes = {'LEFT': 'x', 'RIGHT': 'x', 'TOP': 'y', 'BOTTOM': 'y', 'FACE': 'z', 'BACK': 'z', 'MIDDLE_X': 'x', 'MIDDLE_Y': 'y', 'MIDDLE_Z': 'z'}  # Asegúrate de incluir los ejes para las capas internas
+        self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FACE': self.FACE, 'BACK': self.BACK, 'TOP': self.TOP, 'MIDDLE_X': self.MIDDLE_X, 'MIDDLE_Y': self.MIDDLE_Y, 'MIDDLE_Z': self.MIDDLE_Z}  # Incluye las capas internas
+        self.animation_time = 0.35
         self.action_trigger = True
         self.action_mode = True
         self.message = Text(origin=(0, 19), color=color.black)
@@ -180,7 +206,14 @@ class Game:
         self.BACK = {Vec3(x, y, 1) for x in range(-1, 2) for y in range(-1, 2)}
         self.RIGHT = {Vec3(1, y, z) for y in range(-1, 2) for z in range(-1, 2)}
         self.TOP = {Vec3(x, 1, z) for x in range(-1, 2) for z in range(-1, 2)}
-        self.SIDE_POSITIONS = self.LEFT | self.BOTTOM | self.FACE | self.BACK | self.RIGHT | self.TOP
+
+        # Agrega las nuevas posiciones de las capas internas
+        self.MIDDLE_X = {Vec3(0, y, z) for y in range(-1, 2) for z in range(-1, 2)}
+        self.MIDDLE_Y = {Vec3(x, 0, z) for x in range(-1, 2) for z in range(-1, 2)}
+        self.MIDDLE_Z = {Vec3(x, y, 0) for x in range(-1, 2) for y in range(-1, 2)}
+
+        # Actualiza self.positions con todas las posiciones
+        self.SIDE_POSITIONS = self.LEFT | self.BOTTOM | self.FACE | self.BACK | self.RIGHT | self.TOP | self.MIDDLE_X | self.MIDDLE_Y | self.MIDDLE_Z
 
     def input(self, key):
         if key in 'mouse1 mouse3' and self.action_mode and self.action_trigger:
