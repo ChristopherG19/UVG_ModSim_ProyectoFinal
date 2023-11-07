@@ -17,9 +17,9 @@ class Game:
 
         # * Botones
         # Crear botones para rotar las caras
-        button_scale = (0.15, 0.05)
+        button_scale = (0.30, 0.05)
         button_color = color.azure
-        button_spacing = 0.07  # Espacio vertical entre los botones
+        button_spacing = 0.06  # Espacio vertical entre los botones
         
         # Define las posiciones de las capas internas
         self.MIDDLE_X = {Vec3(0, y, z) for y in range(-1, 2) for z in range(-1, 2)}
@@ -51,20 +51,63 @@ class Game:
         self.rotate_back_button.on_click = self.rotate_back_face
         
         # Agrega botones para rotar las capas internas
-        self.rotate_middle_x_button = Button(text="Rotate Middle X Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 7 * button_spacing))
+        self.rotate_middle_x_button = Button(text="Rotate Middle X Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 6 * button_spacing))
         self.rotate_middle_x_button.on_click = self.rotate_middle_x_layer
 
-        self.rotate_middle_y_button = Button(text="Rotate Middle Y Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 8 * button_spacing))
+        self.rotate_middle_y_button = Button(text="Rotate Middle Y Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 7 * button_spacing))
         self.rotate_middle_y_button.on_click = self.rotate_middle_y_layer
 
-        self.rotate_middle_z_button = Button(text="Rotate Middle Z Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 9 * button_spacing))
+        self.rotate_middle_z_button = Button(text="Rotate Middle Z Layer", color=button_color, scale=button_scale, position=(0.8, 0.2 - 8 * button_spacing))
         self.rotate_middle_z_button.on_click = self.rotate_middle_z_layer
         
+        self.shuffle_button = Button(text="Shuffle Cube", color=button_color, scale=button_scale, position=(0.8, 0.2 - 10 * button_spacing))
+        self.shuffle_button.on_click = self.shuffle_cube
+        
+        # Botón para reiniciar el cubo
+        self.reset_button = Button(text="Reset Cube", color=button_color, scale=button_scale, position=(0.8, 0.2 - 11 * button_spacing))
+        self.reset_button.on_click = self.reset_cube
+        
         # Resolver
-        self.solve_button = Button(text="Solve", color=button_color, scale=button_scale, position=(0.8, 0.2 - 6 * button_spacing))
+        self.solve_button = Button(text="Solve", color=button_color, scale=button_scale, position=(0.8, 0.2 - 9 * button_spacing))
         self.solve_button.on_click = self.rotate_to_solve
         
         self.load_game()
+        
+    def reset_cube(self):
+        # Eliminar todas las entidades del cubo
+        for cube in self.CUBES:
+            destroy(cube)
+        destroy(self.PARENT)
+
+        # Restaurar el plano de fondo
+        Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5, color=color.light_gray)
+
+        # Volver a cargar el juego
+        self.load_game()
+        
+    def to_rubik_notation(move):
+        rubik_notation = {
+            'LEFT': 'L', 'RIGHT': 'R', 'TOP': 'U', 'BOTTOM': 'D', 'FACE': 'F', 'BACK': 'B',
+            'MIDDLE_X': 'X', 'MIDDLE_Y': 'Y', 'MIDDLE_Z': 'Z'
+        }
+        return rubik_notation.get(move, move)
+        
+    def shuffle_cube(self):
+        # Barajar el cubo realizando movimientos aleatorios con retraso
+        possible_moves = ['LEFT', 'RIGHT', 'TOP', 'BOTTOM', 'FACE', 'BACK', 'MIDDLE_X', 'MIDDLE_Y', 'MIDDLE_Z']
+        num_moves = 20  # Puedes ajustar la cantidad de movimientos aleatorios
+        delay_between_moves = 0.5  # Ajusta el retraso entre movimientos
+        
+        def shuffle_recursive():
+            nonlocal num_moves
+            if num_moves > 0:
+                random_move = random.choice(possible_moves)
+                self.rotate_side(random_move)
+                self.movimientos.append(random_move)
+                num_moves -= 1
+                invoke(shuffle_recursive, delay=delay_between_moves)
+
+        shuffle_recursive()
 
     def rotate_right_face(self):
         self.rotate_side('RIGHT')
@@ -105,7 +148,8 @@ class Game:
     
     def rotate_to_solve(self):
         reverse_movements = self.movimientos[::-1]
-        delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
+        delay_between_moves = self.animation_time + random.uniform(0.5, 1.5)
+        # delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
 
         def solve_recursive():
             if reverse_movements:
@@ -152,6 +196,9 @@ class Game:
         self.RIGHT_sensor = create_sensor(name='RIGHT', pos=(0.99, 0, 0), scale=(1.01, 3.01, 3.01))
         self.TOP_sensor = create_sensor(name='TOP', pos=(0, 1, 0), scale=(3.01, 1.01, 3.01))
         self.BOTTOM_sensor = create_sensor(name='BOTTOM', pos=(0, -1, 0), scale=(3.01, 1.01, 3.01))
+        self.MIDDLE_X_sensor = create_sensor(name='MIDDLE_X', pos=(0, 0, 0), scale=(3.01, 3.01, 3.01))
+        self.MIDDLE_Y_sensor = create_sensor(name='MIDDLE_Y', pos=(0, 0, 0), scale=(3.01, 3.01, 3.01))
+        self.MIDDLE_Z_sensor = create_sensor(name='MIDDLE_Z', pos=(0, 0, 0), scale=(3.01, 3.01, 3.01))
 
     def toggle_game_mode(self):
         '''switching view mode or interacting with Rubik's cube'''
