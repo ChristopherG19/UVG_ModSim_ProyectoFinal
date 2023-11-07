@@ -12,6 +12,7 @@ class Game:
         EditorCamera()
         
         self.movimientos = []
+        self.movimientos_show = []
         camera.world_position = (0, 0, -15)
         self.model, self.texture = 'custom_cube', 'rubik_texture'
 
@@ -71,7 +72,13 @@ class Game:
         self.solve_button = Button(text="Solve", color=button_color, scale=button_scale, position=(0.8, 0.2 - 9 * button_spacing))
         self.solve_button.on_click = self.rotate_to_solve
         
+        self.move_text = Text(text='', origin=(0, 15), color=color.black)
+        
         self.load_game()
+        
+    def update_move_text(self):
+        moves_text = ' '.join(self.movimientos_show)
+        self.move_text.text = f"Moves: {moves_text}"
         
     def reset_cube(self):
         # Eliminar todas las entidades del cubo
@@ -85,10 +92,10 @@ class Game:
         # Volver a cargar el juego
         self.load_game()
         
-    def to_rubik_notation(move):
+    def to_rubik_notation(self, move):
         rubik_notation = {
             'LEFT': 'L', 'RIGHT': 'R', 'TOP': 'U', 'BOTTOM': 'D', 'FACE': 'F', 'BACK': 'B',
-            'MIDDLE_X': 'X', 'MIDDLE_Y': 'Y', 'MIDDLE_Z': 'Z'
+            'MIDDLE_X': 'M', 'MIDDLE_Y': 'E', 'MIDDLE_Z': 'S'
         }
         return rubik_notation.get(move, move)
         
@@ -96,7 +103,7 @@ class Game:
         # Barajar el cubo realizando movimientos aleatorios con retraso
         possible_moves = ['LEFT', 'RIGHT', 'TOP', 'BOTTOM', 'FACE', 'BACK', 'MIDDLE_X', 'MIDDLE_Y', 'MIDDLE_Z']
         num_moves = 20  # Puedes ajustar la cantidad de movimientos aleatorios
-        delay_between_moves = 0.5  # Ajusta el retraso entre movimientos
+        delay_between_moves = 0.75  # Ajusta el retraso entre movimientos
         
         def shuffle_recursive():
             nonlocal num_moves
@@ -104,8 +111,10 @@ class Game:
                 random_move = random.choice(possible_moves)
                 self.rotate_side(random_move)
                 self.movimientos.append(random_move)
+                self.movimientos_show.append(self.to_rubik_notation(random_move))
                 num_moves -= 1
                 invoke(shuffle_recursive, delay=delay_between_moves)
+                self.update_move_text()
 
         shuffle_recursive()
 
