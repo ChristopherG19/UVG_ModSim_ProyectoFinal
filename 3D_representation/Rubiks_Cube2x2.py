@@ -82,6 +82,8 @@ class Game:
 
         self.move_text = Text(text='', origin=(0, 15), color=color.black)
 
+        self.movimientos = []
+
         # Volver a cargar el juego
         self.load_game()
         
