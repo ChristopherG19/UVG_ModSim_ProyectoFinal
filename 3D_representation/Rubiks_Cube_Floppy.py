@@ -59,15 +59,16 @@ class Game:
         
     def reset_cube(self):
         # Eliminar todas las entidades del cubo
+        self.move_text.text = ""
+        self.movimientos = []
+        self.movimientos_show = []
+        
         for cube in self.CUBES:
             destroy(cube)
         destroy(self.PARENT)
 
         # Restaurar el plano de fondo
         Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5, color=color.light_gray)
-
-        self.move_text = Text(text='', origin=(0, 15), color=color.black)
-        self.movimientos = []
 
         # Volver a cargar el juego
         self.load_game()
@@ -82,8 +83,8 @@ class Game:
     def shuffle_cube(self):
         # Barajar el cubo realizando movimientos aleatorios con retraso
         possible_moves = ['LEFT', 'RIGHT', 'FRONT', 'BACK']
-        num_moves = 20  # Puedes ajustar la cantidad de movimientos aleatorios
-        delay_between_moves = 0.75  # Ajusta el retraso entre movimientos
+        num_moves = 5  # Puedes ajustar la cantidad de movimientos aleatorios
+        delay_between_moves = 0.5  # Ajusta el retraso entre movimientos
         
         def shuffle_recursive():
             nonlocal num_moves
@@ -101,18 +102,26 @@ class Game:
     def rotate_right_face(self):
         self.rotate_side('RIGHT')
         self.movimientos.append('RIGHT')
+        self.movimientos_show.append(self.to_rubik_notation('RIGHT'))
+        self.update_move_text()
 
     def rotate_left_face(self):
         self.rotate_side('LEFT')
         self.movimientos.append('LEFT')
+        self.movimientos_show.append(self.to_rubik_notation('LEFT'))
+        self.update_move_text()
 
     def rotate_face_face(self):
         self.rotate_side('FRONT')
         self.movimientos.append('FRONT')
+        self.movimientos_show.append(self.to_rubik_notation('FRONT'))
+        self.update_move_text()
 
     def rotate_back_face(self):
         self.rotate_side('BACK')
         self.movimientos.append('BACK')
+        self.movimientos_show.append(self.to_rubik_notation('BACK'))
+        self.update_move_text()
     
     def rotate_to_solve(self):
         reverse_movements = self.movimientos[::-1]
@@ -127,6 +136,8 @@ class Game:
 
         solve_recursive()
         self.movimientos = []
+        self.movimientos_show = []
+        self.move_text.text = ""
             
     def load_game(self):
         self.create_cube_positions()

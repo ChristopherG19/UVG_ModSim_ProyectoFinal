@@ -45,7 +45,7 @@ class Game:
 
         # Botón para rotar la cara frontal
         self.rotate_face_button = Button(text="Rotate Front Face", color=button_color, scale=button_scale, position=(0.7, 0.2 - 4 * button_spacing))
-        self.rotate_face_button.on_click = self.rotate_face_face
+        self.rotate_face_button.on_click = self.rotate_face_front
 
         # Botón para rotar la cara trasera
         self.rotate_back_button = Button(text="Rotate Back Face", color=button_color, scale=button_scale, position=(0.7, 0.2 - 5 * button_spacing))
@@ -89,25 +89,25 @@ class Game:
         # Restaurar el plano de fondo
         Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5, color=color.light_gray)
 
-        self.move_text = Text(text='', origin=(0, 15), color=color.black)
-
         self.movimientos = []
+        self.movimientos_show = []
+        self.move_text.text = ""
 
         # Volver a cargar el juego
         self.load_game()
         
     def to_rubik_notation(self, move):
         rubik_notation = {
-            'LEFT': 'L', 'RIGHT': 'R', 'TOP': 'U', 'BOTTOM': 'D', 'FACE': 'F', 'BACK': 'B',
+            'LEFT': 'L', 'RIGHT': 'R', 'TOP': 'U', 'BOTTOM': 'D', 'FRONT': 'F', 'BACK': 'B',
             'MIDDLE_X': 'M', 'MIDDLE_Y': 'E', 'MIDDLE_Z': 'S'
         }
         return rubik_notation.get(move, move)
         
     def shuffle_cube(self):
         # Barajar el cubo realizando movimientos aleatorios con retraso
-        possible_moves = ['LEFT', 'RIGHT', 'TOP', 'BOTTOM', 'FACE', 'BACK', 'MIDDLE_X', 'MIDDLE_Y', 'MIDDLE_Z']
+        possible_moves = ['LEFT', 'RIGHT', 'TOP', 'BOTTOM', 'FRONT', 'BACK', 'MIDDLE_X', 'MIDDLE_Y', 'MIDDLE_Z']
         num_moves = 20  # Puedes ajustar la cantidad de movimientos aleatorios
-        delay_between_moves = 0.75  # Ajusta el retraso entre movimientos
+        delay_between_moves = 0.5  # Ajusta el retraso entre movimientos
         
         def shuffle_recursive():
             nonlocal num_moves
@@ -125,38 +125,56 @@ class Game:
     def rotate_right_face(self):
         self.rotate_side('RIGHT')
         self.movimientos.append('RIGHT')
+        self.movimientos_show.append(self.to_rubik_notation('RIGHT'))
+        self.update_move_text()
 
     def rotate_left_face(self):
         self.rotate_side('LEFT')
         self.movimientos.append('LEFT')
+        self.movimientos_show.append(self.to_rubik_notation('LEFT'))
+        self.update_move_text()
 
     def rotate_top_face(self):
         self.rotate_side('TOP')
         self.movimientos.append('TOP')
+        self.movimientos_show.append(self.to_rubik_notation('TOP'))
+        self.update_move_text()
 
     def rotate_bottom_face(self):
         self.rotate_side('BOTTOM')
         self.movimientos.append('BOTTOM')
+        self.movimientos_show.append(self.to_rubik_notation('BOTTOM'))
+        self.update_move_text()
 
-    def rotate_face_face(self):
-        self.rotate_side('FACE')
-        self.movimientos.append('FACE')
+    def rotate_face_front(self):
+        self.rotate_side('FRONT')
+        self.movimientos.append('FRONT')
+        self.movimientos_show.append(self.to_rubik_notation('FRONT'))
+        self.update_move_text()
 
     def rotate_back_face(self):
         self.rotate_side('BACK')
         self.movimientos.append('BACK')
+        self.movimientos_show.append(self.to_rubik_notation('BACK'))
+        self.update_move_text()
 
     def rotate_middle_x_layer(self):
         self.rotate_side('MIDDLE_X')
         self.movimientos.append('MIDDLE_X')
+        self.movimientos_show.append(self.to_rubik_notation('MIDDLE_X'))
+        self.update_move_text()
 
     def rotate_middle_y_layer(self):
         self.rotate_side('MIDDLE_Y')
         self.movimientos.append('MIDDLE_Y')
+        self.movimientos_show.append(self.to_rubik_notation('MIDDLE_Y'))
+        self.update_move_text()
 
     def rotate_middle_z_layer(self):
         self.rotate_side('MIDDLE_Z')
         self.movimientos.append('MIDDLE_Z')
+        self.movimientos_show.append(self.to_rubik_notation('MIDDLE_Z'))
+        self.update_move_text()
             
     
     def rotate_to_solve(self):
@@ -172,13 +190,15 @@ class Game:
 
         solve_recursive()
         self.movimientos = []
+        self.movimientos_show = []
+        self.move_text.text = ""
             
     def load_game(self):
         self.create_cube_positions()
         self.CUBES = [Entity(model=self.model, texture=self.texture, position=pos) for pos in self.SIDE_POSITIONS]
         self.PARENT = Entity()
-        self.rotation_axes = {'LEFT': 'x', 'RIGHT': 'x', 'TOP': 'y', 'BOTTOM': 'y', 'FACE': 'z', 'BACK': 'z', 'MIDDLE_X': 'x', 'MIDDLE_Y': 'y', 'MIDDLE_Z': 'z'}  # Asegúrate de incluir los ejes para las capas internas
-        self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FACE': self.FACE, 'BACK': self.BACK, 'TOP': self.TOP, 'MIDDLE_X': self.MIDDLE_X, 'MIDDLE_Y': self.MIDDLE_Y, 'MIDDLE_Z': self.MIDDLE_Z}  # Incluye las capas internas
+        self.rotation_axes = {'LEFT': 'x', 'RIGHT': 'x', 'TOP': 'y', 'BOTTOM': 'y', 'FRONT': 'z', 'BACK': 'z', 'MIDDLE_X': 'x', 'MIDDLE_Y': 'y', 'MIDDLE_Z': 'z'}  # Asegúrate de incluir los ejes para las capas internas
+        self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FRONT': self.FRONT, 'BACK': self.BACK, 'TOP': self.TOP, 'MIDDLE_X': self.MIDDLE_X, 'MIDDLE_Y': self.MIDDLE_Y, 'MIDDLE_Z': self.MIDDLE_Z}  # Incluye las capas internas
         self.animation_time = 0.35
         self.action_trigger = True
         self.action_mode = True
@@ -204,7 +224,7 @@ class Game:
         create_sensor = lambda name, pos, scale: Entity(name=name, position=pos, model='cube', color=color.dark_gray,
                                                         scale=scale, collider='box', visible=False)
         self.LEFT_sensor = create_sensor(name='LEFT', pos=(-0.99, 0, 0), scale=(1.01, 3.01, 3.01))
-        self.FACE_sensor = create_sensor(name='FACE', pos=(0, 0, -0.99), scale=(3.01, 3.01, 1.01))
+        self.FACE_sensor = create_sensor(name='FRONT', pos=(0, 0, -0.99), scale=(3.01, 3.01, 1.01))
         self.BACK_sensor = create_sensor(name='BACK', pos=(0, 0, 0.99), scale=(3.01, 3.01, 1.01))
         self.RIGHT_sensor = create_sensor(name='RIGHT', pos=(0.99, 0, 0), scale=(1.01, 3.01, 3.01))
         self.TOP_sensor = create_sensor(name='TOP', pos=(0, 1, 0), scale=(3.01, 1.01, 3.01))
@@ -256,7 +276,7 @@ class Game:
     def create_cube_positions(self):
         self.LEFT = {Vec3(-1, y, z) for y in range(-1, 2) for z in range(-1, 2)}
         self.BOTTOM = {Vec3(x, -1, z) for x in range(-1, 2) for z in range(-1, 2)}
-        self.FACE = {Vec3(x, y, -1) for x in range(-1, 2) for y in range(-1, 2)}
+        self.FRONT = {Vec3(x, y, -1) for x in range(-1, 2) for y in range(-1, 2)}
         self.BACK = {Vec3(x, y, 1) for x in range(-1, 2) for y in range(-1, 2)}
         self.RIGHT = {Vec3(1, y, z) for y in range(-1, 2) for z in range(-1, 2)}
         self.TOP = {Vec3(x, 1, z) for x in range(-1, 2) for z in range(-1, 2)}
@@ -267,13 +287,13 @@ class Game:
         self.MIDDLE_Z = {Vec3(x, y, 0) for x in range(-1, 2) for y in range(-1, 2)}
 
         # Actualiza self.positions con todas las posiciones
-        self.SIDE_POSITIONS = self.LEFT | self.BOTTOM | self.FACE | self.BACK | self.RIGHT | self.TOP | self.MIDDLE_X | self.MIDDLE_Y | self.MIDDLE_Z
+        self.SIDE_POSITIONS = self.LEFT | self.BOTTOM | self.FRONT | self.BACK | self.RIGHT | self.TOP | self.MIDDLE_X | self.MIDDLE_Y | self.MIDDLE_Z
 
     def input(self, key):
         if key in 'mouse1 mouse3' and self.action_mode and self.action_trigger:
             for hitinfo in mouse.collisions:
                 collider_name = hitinfo.entity.name
-                if (key == 'mouse1' and collider_name in 'LEFT RIGHT FACE BACK' or
+                if (key == 'mouse1' and collider_name in 'LEFT RIGHT FRONT BACK' or
                         key == 'mouse3' and collider_name in 'TOP BOTTOM'):
                     self.rotate_side(collider_name)
                     break
