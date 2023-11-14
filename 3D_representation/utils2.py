@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 def animation_delay(level:str, mvmts = None):
     speed = 0
@@ -36,7 +37,33 @@ def write_to_csv(cube_type, mvmts, time, player_type):
 
         writer.close()
 
-# res = animation_delay("e")
-# print(res)
+
+def gen_data():
+
+    # options
+    cube_types = ["3x3", "3x3V2", "floppy", "2x2"]
+    player_types = ["a", "e"]
+    ct = random.choice(cube_types)
+    pt = random.choice(player_types)
+
+    moves = 0
+
+    if ct == "3x3" or ct == "3x3V2":
+        moves = int(np.random.normal(20, 5))
+
+    elif ct == "floppy":
+        moves = int(np.random.normal(5, 1))
+
+    elif ct == "2x2":
+        moves = int(np.random.normal(15, 3))
+
+    _, Stime = animation_delay(pt, moves)
+
+    write_to_csv(ct, moves, Stime, pt)
+
+
+# for _ in range(500):
+#     gen_data()
+
 
 
