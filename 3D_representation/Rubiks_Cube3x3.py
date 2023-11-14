@@ -1,4 +1,5 @@
 from ursina import *
+from utils2 import *
 
 class Game:
     def __init__(self):
@@ -179,19 +180,24 @@ class Game:
     
     def rotate_to_solve(self):
         reverse_movements = self.movimientos[::-1]
-        delay_between_moves = self.animation_time + random.uniform(0.5, 1.5)
+        mvs = len(reverse_movements)
+        delay_between_moves, Stime = animation_delay("e", mvs)
+        print("dbm", delay_between_moves)
+        # delay_between_moves = self.animation_time + random.uniform(0.5, 1.5)
         # delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
 
         def solve_recursive():
             if reverse_movements:
                 movement = reverse_movements.pop(0)
                 self.rotate_side_2(movement)
-                invoke(solve_recursive, delay=delay_between_moves)
+                invoke(solve_recursive, delay=self.animation_time + delay_between_moves)
 
         solve_recursive()
         self.movimientos = []
         self.movimientos_show = []
-        self.move_text.text = ""
+        self.move_text.text = f'Solved in {"{:.4f}".format(Stime)} s'
+
+        write_to_csv("3x3", mvs, Stime, "e")
             
     def load_game(self):
         self.create_cube_positions()
@@ -199,7 +205,7 @@ class Game:
         self.PARENT = Entity()
         self.rotation_axes = {'LEFT': 'x', 'RIGHT': 'x', 'TOP': 'y', 'BOTTOM': 'y', 'FRONT': 'z', 'BACK': 'z', 'MIDDLE_X': 'x', 'MIDDLE_Y': 'y', 'MIDDLE_Z': 'z'}  # Asegúrate de incluir los ejes para las capas internas
         self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FRONT': self.FRONT, 'BACK': self.BACK, 'TOP': self.TOP, 'MIDDLE_X': self.MIDDLE_X, 'MIDDLE_Y': self.MIDDLE_Y, 'MIDDLE_Z': self.MIDDLE_Z}  # Incluye las capas internas
-        self.animation_time = 0.35
+        self.animation_time = 0.30
         self.action_trigger = True
         self.action_mode = True
         self.message = Text(origin=(0, 19), color=color.black)
@@ -252,7 +258,7 @@ class Game:
             if cube.position in cube_positions:
                 cube.parent = self.PARENT
                 eval(f'self.PARENT.animate_rotation_{rotation_axis}(90, duration=self.animation_time)')
-        invoke(self.toggle_animation_trigger, delay=self.animation_time + 0.11)
+        invoke(self.toggle_animation_trigger, delay = 0.5)
         
     def rotate_side_2(self, side_name):
         self.action_trigger = False

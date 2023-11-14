@@ -1,4 +1,5 @@
 from ursina import *
+from utils2 import *
 
 class Game:
     def __init__(self):
@@ -125,19 +126,22 @@ class Game:
     
     def rotate_to_solve(self):
         reverse_movements = self.movimientos[::-1]
-        delay_between_moves = self.animation_time + random.uniform(0.5, 1.5)
+        mvs = len(reverse_movements)
+        delay_between_moves, Stime = animation_delay("e")
+        print("dbm", delay_between_moves)
         # delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
 
         def solve_recursive():
             if reverse_movements:
                 movement = reverse_movements.pop(0)
                 self.rotate_side_2(movement)
-                invoke(solve_recursive, delay=delay_between_moves)
+                invoke(solve_recursive, delay= self.animation_time + delay_between_moves)
 
         solve_recursive()
         self.movimientos = []
         self.movimientos_show = []
-        self.move_text.text = ""
+        self.move_text.text = f'Solved in {"{:.4f}".format(Stime)} s'
+        write_to_csv("floppy", mvs, Stime, "e")
             
     def load_game(self):
         self.create_cube_positions()
