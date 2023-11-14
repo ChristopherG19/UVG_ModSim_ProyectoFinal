@@ -420,7 +420,7 @@ class Game:
         solve_recursive()
         self.movimientos = []
         self.movimientos_show = []
-        self.move_text.text = f'Solved in {"{:.4f}".format(Stime)}'
+        self.move_text.text = f'Solved in {"{:.4f}".format(Stime)} s'
 
         write_to_csv("3x3V2", mvs, Stime, "e")
     
