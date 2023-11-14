@@ -1,5 +1,6 @@
 from ursina import *
 from utils import *
+from utils2 import *
 import random
 import time
 SOLVED_CUBE_STR = "OOOOOOOOOYYYWWWGGGBBBYYYWWWGGGBBBYYYWWWGGGBBBRRRRRRRRR"
@@ -405,7 +406,7 @@ class Game:
 
     def rotate_to_solve(self):
         reverse_movements = self.movimientos[::-1]
-        delay_between_moves = self.animation_time + random.uniform(0.5, 1.5)
+        delay_between_moves = self.animation_time + animation_delay("e")
         # delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
 
         def solve_recursive():
