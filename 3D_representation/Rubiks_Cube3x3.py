@@ -180,7 +180,8 @@ class Game:
     
     def rotate_to_solve(self):
         reverse_movements = self.movimientos[::-1]
-        delay_between_moves = animation_delay("e")
+        mvs = len(reverse_movements)
+        delay_between_moves, Stime = animation_delay("e", mvs)
         print("dbm", delay_between_moves)
         # delay_between_moves = self.animation_time + random.uniform(0.5, 1.5)
         # delay_between_moves = self.animation_time + 0.11  # Delay de la función rotate_side_2
@@ -194,7 +195,9 @@ class Game:
         solve_recursive()
         self.movimientos = []
         self.movimientos_show = []
-        self.move_text.text = ""
+        self.move_text.text = f'Solved in {"{:.4f}".format(Stime)}'
+
+        write_to_csv("3x3", mvs, Stime, "e")
             
     def load_game(self):
         self.create_cube_positions()
