@@ -1,4 +1,5 @@
 from ursina import *
+from utils2 import *
 
 class Game:
     def __init__(self):
@@ -252,7 +253,7 @@ class Game:
             if cube.position in cube_positions:
                 cube.parent = self.PARENT
                 eval(f'self.PARENT.animate_rotation_{rotation_axis}(90, duration=self.animation_time)')
-        invoke(self.toggle_animation_trigger, delay=self.animation_time + 0.11)
+        invoke(self.toggle_animation_trigger, delay=1 * animation_delay("e"))
         
     def rotate_side_2(self, side_name):
         self.action_trigger = False
